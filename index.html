@@ -2,10 +2,26 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <title>Login da Galeria</title>
 </head>
 <body>
-    <h1>Página de Login</h1>
-    <p>Em breve...</p>
+    <h1>Login da Galeria</h1>
+
+<form id="login-form">
+    <div>
+        <label for="login-email">Email:</label>
+        <input type="email" id="login-email" required>
+    </div>
+    <div>
+        <label for="login-password">Senha:</label>
+        <input type="password" id="login-password" required>
+    </div>
+    <button type="submit">Entrar</button>
+</form>
+
+<p id="login-message"></p>
+
+<script src="app.js"></script>
 </body>
 </html>
