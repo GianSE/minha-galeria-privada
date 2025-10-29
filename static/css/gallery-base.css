@@ -118,10 +118,3 @@ main {
 .lightbox-arrow:hover {
     background-color: rgba(0, 0, 0, 0.4);
 }
-
-/* Esconde as setas em telas pequenas (o swipe será usado)
-@media (max-width: 700px) {
-    .lightbox-arrow {
-        display: none;
-    }
-} */
