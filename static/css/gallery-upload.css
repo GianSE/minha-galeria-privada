@@ -23,7 +23,6 @@
     background-color: #e9f5ff; border-color: #007bff;
 }
 
-/* --- NOVOS ESTILOS (Cancelamento) --- */
 .upload-actions {
     display: flex; /* Coloca os botões lado a lado */
     gap: 10px;
@@ -53,18 +52,12 @@
     background-color: #c82333;
 }
 
+/* --- MUDANÇA AQUI --- */
+/* Regras .is-uploading removidas. */
+/* Agora, o botão cancelar começa escondido e o JS controla quando ele aparece. */
 .hidden {
-    display: none; /* Classe simples para esconder */
+    display: none; 
 }
-
-/* Lógica de UI: Quando o formulário estiver "enviando" */
-.upload-section.is-uploading #submit-upload-button {
-    display: none; /* Esconde o botão "Enviar" */
-}
-.upload-section.is-uploading #cancel-upload-button {
-    display: block; /* Mostra o botão "Cancelar" */
-}
-/* Por padrão, o "Cancelar" começa escondido */
 #cancel-upload-button {
     display: none;
 }

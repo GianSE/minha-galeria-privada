@@ -6,19 +6,15 @@ import * as service from './gallery-service.js';
 let galleryGrid, uploadForm, logoutButton, fileInput, dropZone;
 let fileNameSpan, uploadMessage, storageInfo;
 let lightboxModal, lightboxImg, lightboxClose, lightboxPrev, lightboxNext;
-let submitUploadButton, cancelUploadButton; // --- NOVO ---
+let submitUploadButton, cancelUploadButton; 
 
 // --- Variáveis de Estado da UI ---
 let selectedFiles = []; 
 let currentPhotoList = []; 
 let currentPhotoIndex = 0; 
 let touchStartX = 0, touchMoveX = 0;
-
-// --- NOVAS Variáveis de Estado (Cancelamento) ---
 let isUploading = false;
 let cancelUpload = false;
-// --- FIM NOVO ---
-
 
 // --- 1. FUNÇÕES DE RENDERIZAÇÃO E UI ---
 // (Funções showMessage e renderPhoto não mudam)
@@ -27,12 +23,10 @@ function showMessage(element, text, isError = false) {
     element.textContent = text;
     element.className = isError ? 'message message-error' : 'message message-success';
 }
-
-function renderPhoto(file, index) {
+function renderPhoto(file, index) { /* ... (código igual) ... */ 
     const fileSize = file.metadata ? formatBytes(file.metadata.size) : 'Tamanho desconhecido';
     const item = document.createElement('div');
     item.className = 'gallery-item';
-    
     item.innerHTML = `
         <img src="${file.signedUrl}" alt="${file.name}" data-index="${index}">
         <div class="gallery-item-meta">
@@ -51,53 +45,46 @@ function renderPhoto(file, index) {
 
 // --- 2. FUNÇÕES DO LIGHTBOX ---
 // (Funções showPhotoAtIndex, openLightbox, closeLightbox não mudam)
-function showPhotoAtIndex(index) {
+function showPhotoAtIndex(index) { /* ... (código igual) ... */ 
     if (index < 0 || index >= currentPhotoList.length) return;
     currentPhotoIndex = index;
     lightboxImg.src = currentPhotoList[index];
     lightboxPrev.style.display = (index === 0) ? 'none' : 'block';
     lightboxNext.style.display = (index === currentPhotoList.length - 1) ? 'none' : 'block';
 }
-function openLightbox(index) {
+function openLightbox(index) { /* ... (código igual) ... */ 
     lightboxModal.style.display = "flex";
     showPhotoAtIndex(index);
 }
-function closeLightbox() {
+function closeLightbox() { /* ... (código igual) ... */ 
     lightboxModal.style.display = "none";
 }
 
 // --- 3. FUNÇÃO PRINCIPAL DE ATUALIZAÇÃO DA UI ---
 // (Função refreshGallery não muda)
-export async function refreshGallery() {
+export async function refreshGallery() { /* ... (código igual) ... */ 
     if (!galleryGrid || !storageInfo) return; 
-
     galleryGrid.innerHTML = '<p>Carregando fotos...</p>';
     storageInfo.textContent = 'Calculando espaço usado...';
-
     const { photoData, totalSize, error } = await service.loadPhotos();
-
     if (error) {
         galleryGrid.innerHTML = `<p class="message message-error">Erro ao carregar fotos: ${error}</p>`;
         return;
     }
-    
     currentPhotoList = []; 
     galleryGrid.innerHTML = ''; 
-
     if (photoData.length === 0) {
         galleryGrid.innerHTML = '<p>Sua galeria está vazia.</p>';
         storageInfo.textContent = 'Total usado: 0 Bytes de 1 GB (0.00%)';
         return;
     }
-
     photoData.forEach((file, index) => {
         if (file.signedUrl) {
             currentPhotoList.push(file.signedUrl); 
             renderPhoto(file, index);
         }
     });
-
-    const totalGBemBytes = 1073741824; // 1 GB
+    const totalGBemBytes = 1073741824; 
     const percentage = (totalSize / totalGBemBytes) * 100;
     storageInfo.textContent = `Total usado: ${formatBytes(totalSize)} de 1 GB (${percentage.toFixed(2)}%)`;
 }
@@ -119,25 +106,37 @@ export function setupUIListeners() {
     lightboxClose = document.getElementById('lightbox-close');
     lightboxPrev = document.getElementById('lightbox-prev');
     lightboxNext = document.getElementById('lightbox-next');
-    
-    // --- MUDANÇA (Cancelamento) ---
     submitUploadButton = document.getElementById('submit-upload-button');
     cancelUploadButton = document.getElementById('cancel-upload-button');
-    // --- FIM MUDANÇA ---
 
     if (!uploadForm || !galleryGrid || !logoutButton || !lightboxModal) {
         console.error("DEBUG: Elementos essenciais da UI não encontrados. Verifique seu HTML.");
         return;
     }
 
-    // --- Listeners do Drag-and-Drop (Não muda) ---
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            selectedFiles = Array.from(fileInput.files);
+    // --- MUDANÇA: Função de "Limpar Seleção" ---
+    function clearSelection() {
+        selectedFiles = [];
+        fileInput.value = null; // <- O passo mais importante para limpar
+        fileNameSpan.textContent = 'Nenhum arquivo selecionado';
+        cancelUploadButton.style.display = 'none'; // Esconde o botão "Limpar"
+        submitUploadButton.style.display = 'block'; // Garante que "Enviar" está visível
+        showMessage(uploadMessage, ''); // Limpa a mensagem
+    }
+
+    // --- MUDANÇA: Listeners do Drag-and-Drop (Atualizado) ---
+    function handleFileSelection(files) {
+        if (files.length > 0) {
+            selectedFiles = Array.from(files);
             fileNameSpan.textContent = `${selectedFiles.length} fotos selecionadas`;
+            // Mostra o botão "Limpar"
+            cancelUploadButton.textContent = 'Limpar Seleção';
+            cancelUploadButton.style.display = 'block';
         }
-    });
+    }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => handleFileSelection(fileInput.files));
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drop-zone--over'); });
     ['dragleave', 'dragend'].forEach(type => {
         dropZone.addEventListener(type, () => dropZone.classList.remove('drop-zone--over'));
@@ -145,33 +144,31 @@ export function setupUIListeners() {
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('drop-zone--over');
-        if (e.dataTransfer.files.length > 0) {
-            selectedFiles = Array.from(e.dataTransfer.files);
-            fileInput.files = e.dataTransfer.files; 
-            fileNameSpan.textContent = `${selectedFiles.length} fotos selecionadas`;
-        }
+        fileInput.files = e.dataTransfer.files; // Sincroniza
+        handleFileSelection(e.dataTransfer.files);
     });
 
-    // --- MUDANÇA (Cancelamento): Listener de Envio (Atualizado) ---
+    // --- MUDANÇA: Listener de Envio (Atualizado) ---
     uploadForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {
             showMessage(uploadMessage, 'Por favor, selecione um ou mais arquivos.', true);
             return;
         }
-        if (isUploading) return; // Previne duplo clique
+        if (isUploading) return; 
 
         // 1. Inicia o estado de upload
         isUploading = true;
         cancelUpload = false;
-        uploadForm.classList.add('is-uploading'); // CSS vai trocar os botões
+        cancelUploadButton.textContent = 'Cancelar Envio'; // Muda o texto
+        submitUploadButton.style.display = 'none'; // Esconde "Enviar"
 
         const totalFiles = selectedFiles.length;
         let filesUploaded = 0;
         let errors = [];
 
         for (const file of selectedFiles) {
-            // 2. Verifica o sinalizador de cancelamento ANTES de cada upload
+            // 2. Verifica o sinalizador de cancelamento
             if (cancelUpload) {
                 showMessage(uploadMessage, 'Envio cancelado pelo usuário.', true);
                 break; // Sai do loop
@@ -188,12 +185,11 @@ export function setupUIListeners() {
             }
         }
 
-        // 3. Finaliza o estado de upload (aconteça o que acontecer)
+        // 3. Finaliza o estado de upload
         isUploading = false;
-        uploadForm.classList.remove('is-uploading'); // CSS restaura os botões
+        submitUploadButton.style.display = 'block'; // Restaura "Enviar"
 
-        // 4. Reporta o resultado
-        if (!cancelUpload) { // Só mostra o resultado final se não foi cancelado
+        if (!cancelUpload) {
             if (errors.length > 0) {
                 showMessage(uploadMessage, `Envio concluído com ${errors.length} erros. ${filesUploaded} fotos enviadas.`, true);
             } else {
@@ -201,18 +197,21 @@ export function setupUIListeners() {
             }
         }
 
-        // 5. Limpa e recarrega
-        uploadForm.reset(); 
-        selectedFiles = [];
-        fileNameSpan.textContent = 'Nenhum arquivo selecionado';
+        // 4. Limpa e recarrega
+        clearSelection(); // Usa a nova função para limpar tudo
         await refreshGallery(); 
     });
 
-    // --- MUDANÇA: Listener do botão "Cancelar" ---
+    // --- MUDANÇA: Listener do botão "Cancelar" (Atualizado) ---
     cancelUploadButton.addEventListener('click', () => {
         if (isUploading) {
+            // Lógica para CANCELAR O ENVIO
             showMessage(uploadMessage, 'Cancelando... Aguarde o término do arquivo atual.', true);
             cancelUpload = true; // Define o sinalizador
+        } else {
+            // Lógica para LIMPAR A SELEÇÃO
+            clearSelection();
+            showMessage(uploadMessage, 'Seleção limpa.', false);
         }
     });
 
@@ -220,17 +219,15 @@ export function setupUIListeners() {
     logoutButton.addEventListener('click', service.handleLogout);
 
     // --- Listeners do Grid (Não muda) ---
-    galleryGrid.addEventListener('click', async (event) => {
+    galleryGrid.addEventListener('click', async (event) => { /* ... (código igual) ... */
         const target = event.target;
         const filename = target.dataset.filename;
-
         if (target.classList.contains('delete-button')) {
             if (!confirm(`Tem certeza que quer deletar a foto "${filename}"?`)) return;
             const { error } = await service.deletePhoto(filename);
             if (error) alert(`Falha ao deletar: ${error.message}`);
             else await refreshGallery();
         }
-        
         if (target.classList.contains('rename-button')) {
             const extension = filename.substring(filename.lastIndexOf('.'));
             const oldNameOnly = filename.substring(0, filename.lastIndexOf('.'));
@@ -241,7 +238,6 @@ export function setupUIListeners() {
             if (error) alert(`Falha ao renomear: ${error.message}`);
             else await refreshGallery();
         }
-
         if (target.tagName === 'IMG') {
             const index = parseInt(target.dataset.index, 10);
             openLightbox(index);
@@ -253,7 +249,7 @@ export function setupUIListeners() {
     lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) closeLightbox(); });
     lightboxNext.addEventListener('click', () => showPhotoAtIndex(currentPhotoIndex + 1));
     lightboxPrev.addEventListener('click', () => showPhotoAtIndex(currentPhotoIndex - 1));
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e) => { /* ... (código igual) ... */
         if (lightboxModal.style.display === 'flex') {
             if (e.key === 'ArrowRight') showPhotoAtIndex(currentPhotoIndex + 1);
             if (e.key === 'ArrowLeft') showPhotoAtIndex(currentPhotoIndex - 1);
@@ -262,7 +258,7 @@ export function setupUIListeners() {
     });
     lightboxModal.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
     lightboxModal.addEventListener('touchmove', (e) => { touchMoveX = e.touches[0].clientX; });
-    lightboxModal.addEventListener('touchend', () => {
+    lightboxModal.addEventListener('touchend', () => { /* ... (código igual) ... */
         if (touchMoveX === 0) return;
         const deltaX = touchMoveX - touchStartX;
         if (deltaX > 50) showPhotoAtIndex(currentPhotoIndex - 1);
