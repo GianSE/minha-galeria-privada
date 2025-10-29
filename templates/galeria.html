@@ -21,9 +21,10 @@
             <h2>Enviar nova foto</h2>
             
             <div id="drop-zone" class="drop-zone">
-                <input type="file" id="file-input" class="drop-zone__input" accept="image/*">
+                <input type="file" id="file-input" class="drop-zone__input" accept="image/*" multiple>
+                
                 <p class="drop-zone__prompt">
-                    Arraste e solte sua foto aqui<br>ou <strong>clique para selecionar</strong>
+                    Arraste e solte suas fotos aqui<br>ou <strong>clique para selecionar</strong>
                 </p>
                 <span id="file-name" class="drop-zone__file-name">Nenhum arquivo selecionado</span>
             </div>
@@ -41,12 +42,11 @@
 
     <div id="lightbox-modal" class="lightbox-modal">
         <span id="lightbox-close" class="lightbox-close">&times;</span>
-        
         <a id="lightbox-prev" class="lightbox-arrow prev">&#10094;</a>
         <a id="lightbox-next" class="lightbox-arrow next">&#10095;</a>
-
         <img id="lightbox-img" class="lightbox-content" alt="Imagem ampliada">
     </div>
+
     <script src="../static/js/gallery.js" type="module"></script>
 </body>
 </html>
