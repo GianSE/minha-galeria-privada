@@ -1,12 +1,23 @@
 // --- PASSO A: INICIALIZAÇÃO (PÁGINA DA GALERIA) ---
 const SUPABASE_URL = 'https://ohxhnegyewnytbvbeuvp.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oeGhuZWd5ZXdueXRidmJldXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2OTY2NjIsImV4cCI6MjA3NzI3MjY2Mn0.rqzmNabEI0KyrPx9o604igq_CctSVc81ia_T2KZ_BAA';
+const SUPABASE_KEY = 'eyJhbGciOiJIZUI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oeGhuZWd5ZXdueXRidmJldXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2OTY2NjIsImV4cCI6MjA3NzI3MjY2Mn0.rqzmNabEI0KyrPx9o604igq_CctSVc81ia_T2KZ_BAA';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 console.log('DEBUG: gallery.js carregado. Supabase conectado.');
 
-// --- INÍCIO DA FASE 5: VARIÁVEIS GLOBAIS ---
+// --- FASE 6: Função auxiliar para formatar bytes ---
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+// --- FIM FASE 6 ---
+
+// --- Variáveis Globais (DOM) ---
 let currentUser = null; // Vamos guardar o usuário aqui
 const galleryGrid = document.getElementById('gallery-grid');
 const uploadForm = document.getElementById('upload-form');
@@ -15,17 +26,18 @@ const fileInput = document.getElementById('file-input');
 const dropZone = document.getElementById('drop-zone');
 const fileNameSpan = document.getElementById('file-name');
 const uploadMessage = document.getElementById('upload-message');
+const storageInfo = document.getElementById('storage-info'); // --- FASE 6 ---
 
-// --- INÍCIO DA FASE 5: FUNÇÃO DE CARREGAR FOTOS ---
+// --- Função de CARREGAR FOTOS (Atualizada p/ Fase 6) ---
 async function loadPhotos() {
-    if (!currentUser) return; // Não faz nada se o usuário não estiver logado
+    if (!currentUser) return;
 
     galleryGrid.innerHTML = '<p>Carregando fotos...</p>';
+    let totalSize = 0; // --- FASE 6 ---
 
-    // 1. Lista todos os arquivos na pasta do usuário
     const { data: files, error } = await supabaseClient.storage
-        .from('fotos') // Nosso bucket
-        .list(currentUser.id, { // A pasta do usuário
+        .from('fotos') 
+        .list(currentUser.id, { 
             limit: 100,
             offset: 0,
             sortBy: { column: 'created_at', order: 'desc' },
@@ -39,47 +51,67 @@ async function loadPhotos() {
 
     if (files.length === 0) {
         galleryGrid.innerHTML = '<p>Sua galeria está vazia.</p>';
+        storageInfo.textContent = 'Total usado: 0 Bytes de 1 GB'; // --- FASE 6 ---
         return;
     }
 
-    galleryGrid.innerHTML = ''; // Limpa o "Carregando..."
+    galleryGrid.innerHTML = ''; 
 
-    // 2. Cria as URLs assinadas (temporárias e seguras) para cada foto
     for (const file of files) {
+        // --- FASE 6: Soma o tamanho total ---
+        if (file.metadata && file.metadata.size) {
+            totalSize += file.metadata.size;
+        }
+
         const { data: urlData, error: urlError } = await supabaseClient.storage
             .from('fotos')
-            .createSignedUrl(`${currentUser.id}/${file.name}`, 3600); // URL válida por 1 hora
+            .createSignedUrl(`${currentUser.id}/${file.name}`, 3600); 
 
         if (urlError) {
             console.error(`DEBUG: Erro ao criar URL para ${file.name}:`, urlError.message);
         } else {
-            // 3. Adiciona a foto ao grid
+            // --- FASE 6: Atualiza o HTML do item da galeria ---
             const item = document.createElement('div');
             item.className = 'gallery-item';
+            
+            // Mostra o tamanho do arquivo
+            const fileSize = file.metadata ? formatBytes(file.metadata.size) : 'Tamanho desconhecido';
+
             item.innerHTML = `
                 <img src="${urlData.signedUrl}" alt="${file.name}">
+                
+                <div class="gallery-item-meta">
+                    <span class="file-size">Tamanho: ${fileSize}</span>
+                </div>
+                
                 <div class="gallery-item-info">
                     <span>${file.name}</span>
+                </div>
+
+                <div class="gallery-item-actions">
+                    <button class="rename-button" data-filename="${file.name}">Renomear</button>
                     <button class="delete-button" data-filename="${file.name}">Deletar</button>
                 </div>
             `;
             galleryGrid.appendChild(item);
         }
     }
+
+    // --- FASE 6: Atualiza o texto do total usado ---
+    storageInfo.textContent = `Total usado (apenas fotos listadas): ${formatBytes(totalSize)} de 1 GB`;
 }
 
-// --- INÍCIO DA FASE 5: FUNÇÃO DE DELETAR FOTOS ---
+// --- Função de DELETAR FOTOS (Fase 5) ---
 async function deletePhoto(filename) {
     if (!currentUser || !filename) return;
 
-    // Pede confirmação
     if (!confirm(`Tem certeza que quer deletar a foto "${filename}"?`)) {
         return;
     }
 
     const { error } = await supabaseClient.storage
         .from('fotos')
-        .remove([`${currentUser.id}/${filename}`]); // Remove o arquivo do storage
+        .remove([`${currentUser.id}/${filename}`]); 
 
     if (error) {
         console.error('DEBUG: Erro ao deletar:', error.message);
@@ -90,38 +122,62 @@ async function deletePhoto(filename) {
     }
 }
 
+// --- FASE 6: Função de RENOMEAR FOTOS ---
+async function renamePhoto(oldFilename) {
+    if (!currentUser || !oldFilename) return;
+
+    // Pega o nome e a extensão
+    const extension = oldFilename.substring(oldFilename.lastIndexOf('.'));
+    const oldNameOnly = oldFilename.substring(0, oldFilename.lastIndexOf('.'));
+
+    // Pede o novo nome
+    const newNameOnly = prompt("Digite o novo nome para a foto (sem a extensão):", oldNameOnly);
+
+    // Validação
+    if (!newNameOnly || newNameOnly === oldNameOnly) {
+        console.log('DEBUG: Renomeação cancelada.');
+        return; // Cancela se o usuário clicar "cancelar" ou não mudar o nome
+    }
+
+    const newFilename = `${newNameOnly}${extension}`;
+    const oldPath = `${currentUser.id}/${oldFilename}`;
+    const newPath = `${currentUser.id}/${newFilename}`;
+
+    // Tenta mover (renomear) o arquivo
+    const { error } = await supabaseClient.storage
+        .from('fotos')
+        .move(oldPath, newPath);
+
+    if (error) {
+        console.error('DEBUG: Erro ao renomear:', error.message);
+        alert(`Falha ao renomear a foto: ${error.message}`);
+    } else {
+        console.log('DEBUG: Foto renomeada com sucesso!');
+        loadPhotos(); // Recarrega a galeria
+    }
+}
+// --- FIM FASE 6 ---
+
 
 // --- LÓGICA PRINCIPAL DA PÁGINA (TUDO DEPENDE DO DOM) ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- INÍCIO DA FASE 5: VERIFICAÇÃO DE SEGURANÇA ---
-    // Esta é a função mais importante da página.
-    // Ela roda ANTES de todo o resto.
+    // --- Verificação de Segurança (Fase 5) ---
     async function checkUserSession() {
         const { data, error } = await supabaseClient.auth.getSession();
         
-        if (error) {
-            console.error('Erro ao pegar sessão:', error.message);
-            window.location.href = '../index.html'; // Falha? Vai pro login.
-            return;
-        }
-
-        if (!data.session) {
-            // Se não há sessão (usuário não logado)
+        if (error || !data.session) {
             console.log("DEBUG: Nenhum usuário logado. Redirecionando para login.");
             window.location.href = '../index.html';
         } else {
-            // Se ESTÁ logado
             console.log("DEBUG: Usuário logado!", data.session.user.email);
             currentUser = data.session.user; // Guarda o usuário
-            
-            // Agora que sabemos quem é o usuário, carregamos as fotos
-            loadPhotos();
+            loadPhotos(); // Carrega as fotos
         }
     }
-    // --- FIM DA VERIFICAÇÃO DE SEGURANÇA ---
+    // --- Fim Verificação de Segurança ---
 
-    // --- LÓGICA DE UPLOAD (Fase 4, adaptada) ---
+    // --- Lógica de Upload (Fase 4) ---
     if (uploadForm) {
       let selectedFile = null; 
       
@@ -173,14 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           console.log('DEBUG: Upload com sucesso!');
           uploadMessage.textContent = 'Foto enviada com sucesso!';
-          uploadMessage.className = 'message message-success';
           uploadForm.reset(); 
           selectedFile = null;
           fileNameSpan.textContent = 'Nenhum arquivo selecionado';
           
-          // --- MUDANÇA DA FASE 5 ---
-          // Recarrega a galeria para mostrar a nova foto
-          loadPhotos(); 
+          loadPhotos(); // Recarrega a galeria
         }
       });
     } // Fim do if(uploadForm)
@@ -193,19 +246,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // --- INÍCIO DA FASE 5: "Escutador" de cliques para DELETAR ---
-    // Usamos "event delegation" para pegar cliques nos botões de deletar
+    // --- FASE 6: "Escutador" de cliques (Atualizado) ---
     if (galleryGrid) {
         galleryGrid.addEventListener('click', (event) => {
-            // Verifica se o clique foi em um botão de deletar
-            if (event.target.classList.contains('delete-button')) {
-                const filename = event.target.dataset.filename;
+            const target = event.target; // O elemento exato que foi clicado
+            
+            // Verifica se foi o botão DELETAR
+            if (target.classList.contains('delete-button')) {
+                const filename = target.dataset.filename;
                 deletePhoto(filename);
+            }
+            
+            // Verifica se foi o botão RENOMEAR
+            if (target.classList.contains('rename-button')) {
+                const filename = target.dataset.filename;
+                renamePhoto(filename);
             }
         });
     }
     
-    // --- FINALMENTE, RODA A VERIFICAÇÃO DE SEGURANÇA ---
+    // --- RODA A VERIFICAÇÃO DE SEGURANÇA ---
     checkUserSession();
     
 }); // Fim do 'DOMContentLoaded'

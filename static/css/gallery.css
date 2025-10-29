@@ -108,4 +108,60 @@ main {
     padding: 5px 8px;
     font-size: 0.8em;
 }
-.delete-button:hover { background: #e60000; }
+.delete-button:hover { 
+    background: #e60000; 
+}
+
+/* --- NOVOS ESTILOS (Fase 6) --- */
+
+/* Estilo para o total de armazenamento */
+.storage-info {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    padding: 10px 15px;
+    background-color: #e9f5ff;
+    border: 1px solid #b8dcfc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Container para os metadados da foto */
+.gallery-item-meta {
+    padding: 0 10px 5px 10px;
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* Container para os botões */
+.gallery-item-actions {
+    padding: 5px 10px 10px 10px;
+    display: flex;
+    gap: 5px; /* Espaço entre os botões */
+}
+
+.gallery-item-actions button {
+    width: 100%;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.rename-button {
+    background: #ffc107; /* Amarelo */
+    color: #333;
+}
+.rename-button:hover {
+    background: #e0a800;
+}
+
+.delete-button {
+    background: #dc3545; /* Vermelho */
+    color: white;
+}
+.delete-button:hover {
+    background: #c82333;
+}
