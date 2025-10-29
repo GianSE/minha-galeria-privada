@@ -1,0 +1,24 @@
+.upload-section {
+    background: #f9f9f9; border: 1px solid #ddd;
+    padding: 20px; border-radius: 8px; margin-bottom: 30px;
+}
+.upload-section h2 { margin-top: 0; }
+
+.drop-zone {
+    width: 100%; height: 150px; border: 2px dashed #ccc;
+    border-radius: 8px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    background-color: #fafafa; cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    margin-bottom: 15px;
+}
+.drop-zone__input { display: none; }
+.drop-zone__prompt { color: #888; }
+.drop-zone__prompt strong { color: #007bff; }
+.drop-zone__file-name {
+    color: #333; font-weight: bold;
+    font-size: 0.9em; margin-top: 5px;
+}
+.drop-zone--over {
+    background-color: #e9f5ff; border-color: #007bff;
+}
