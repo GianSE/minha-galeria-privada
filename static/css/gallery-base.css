@@ -88,3 +88,40 @@ main {
     color: #bbb;
     text-decoration: none;
 }
+
+/* --- NOVOS ESTILOS (Fase 6.2 - Setas do Lightbox) --- */
+
+.lightbox-arrow {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    transition: 0.3s;
+    user-select: none; /* Impede que o usuário selecione o texto da seta */
+    border-radius: 0 3px 3px 0;
+}
+
+.lightbox-arrow.prev {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.lightbox-arrow.next {
+    right: 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.lightbox-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Esconde as setas em telas pequenas (o swipe será usado) */
+@media (max-width: 700px) {
+    .lightbox-arrow {
+        display: none;
+    }
+}

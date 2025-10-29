@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Se estiver logado, continua
     if (user) {
         // 3. Configura todos os botões e listeners da UI
+        // Esta função agora TAMBÉM define as variáveis do DOM
         setupUIListeners();
         
         // 4. Carrega as fotos pela primeira vez
