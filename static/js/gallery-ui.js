@@ -6,15 +6,22 @@ import * as service from './gallery-service.js';
 let galleryGrid, uploadForm, logoutButton, fileInput, dropZone;
 let fileNameSpan, uploadMessage, storageInfo;
 let lightboxModal, lightboxImg, lightboxClose, lightboxPrev, lightboxNext;
+let submitUploadButton, cancelUploadButton; // --- NOVO ---
 
-// --- MUDANÇA: 'selectedFile' agora é 'selectedFiles' (um array) ---
-let selectedFiles = []; // Arquivos selecionados
-let currentPhotoList = []; // Lista de fotos para o lightbox
-let currentPhotoIndex = 0; // Índice atual do lightbox
-let touchStartX = 0, touchMoveX = 0; // Para swipe
+// --- Variáveis de Estado da UI ---
+let selectedFiles = []; 
+let currentPhotoList = []; 
+let currentPhotoIndex = 0; 
+let touchStartX = 0, touchMoveX = 0;
+
+// --- NOVAS Variáveis de Estado (Cancelamento) ---
+let isUploading = false;
+let cancelUpload = false;
+// --- FIM NOVO ---
+
 
 // --- 1. FUNÇÕES DE RENDERIZAÇÃO E UI ---
-
+// (Funções showMessage e renderPhoto não mudam)
 function showMessage(element, text, isError = false) {
     if (!element) return; 
     element.textContent = text;
@@ -43,7 +50,7 @@ function renderPhoto(file, index) {
 }
 
 // --- 2. FUNÇÕES DO LIGHTBOX ---
-
+// (Funções showPhotoAtIndex, openLightbox, closeLightbox não mudam)
 function showPhotoAtIndex(index) {
     if (index < 0 || index >= currentPhotoList.length) return;
     currentPhotoIndex = index;
@@ -60,7 +67,7 @@ function closeLightbox() {
 }
 
 // --- 3. FUNÇÃO PRINCIPAL DE ATUALIZAÇÃO DA UI ---
-
+// (Função refreshGallery não muda)
 export async function refreshGallery() {
     if (!galleryGrid || !storageInfo) return; 
 
@@ -74,8 +81,8 @@ export async function refreshGallery() {
         return;
     }
     
-    currentPhotoList = []; // Limpa a lista
-    galleryGrid.innerHTML = ''; // Limpa o grid
+    currentPhotoList = []; 
+    galleryGrid.innerHTML = ''; 
 
     if (photoData.length === 0) {
         galleryGrid.innerHTML = '<p>Sua galeria está vazia.</p>';
@@ -112,57 +119,64 @@ export function setupUIListeners() {
     lightboxClose = document.getElementById('lightbox-close');
     lightboxPrev = document.getElementById('lightbox-prev');
     lightboxNext = document.getElementById('lightbox-next');
+    
+    // --- MUDANÇA (Cancelamento) ---
+    submitUploadButton = document.getElementById('submit-upload-button');
+    cancelUploadButton = document.getElementById('cancel-upload-button');
+    // --- FIM MUDANÇA ---
 
     if (!uploadForm || !galleryGrid || !logoutButton || !lightboxModal) {
         console.error("DEBUG: Elementos essenciais da UI não encontrados. Verifique seu HTML.");
         return;
     }
 
-    // --- MUDANÇA: Listeners do Drag-and-Drop (Atualizado para múltiplos) ---
+    // --- Listeners do Drag-and-Drop (Não muda) ---
     dropZone.addEventListener('click', () => fileInput.click());
-    
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
-            // Converte a FileList (que não é um array) para um array
             selectedFiles = Array.from(fileInput.files);
             fileNameSpan.textContent = `${selectedFiles.length} fotos selecionadas`;
         }
     });
-    
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drop-zone--over'); });
-    
     ['dragleave', 'dragend'].forEach(type => {
         dropZone.addEventListener(type, () => dropZone.classList.remove('drop-zone--over'));
     });
-    
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('drop-zone--over');
         if (e.dataTransfer.files.length > 0) {
-            // Converte a FileList para um array e a armazena
             selectedFiles = Array.from(e.dataTransfer.files);
-            fileInput.files = e.dataTransfer.files; // Sincroniza com o input
+            fileInput.files = e.dataTransfer.files; 
             fileNameSpan.textContent = `${selectedFiles.length} fotos selecionadas`;
         }
     });
 
-    // --- MUDANÇA: Listener de Envio (Atualizado para múltiplos) ---
+    // --- MUDANÇA (Cancelamento): Listener de Envio (Atualizado) ---
     uploadForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {
             showMessage(uploadMessage, 'Por favor, selecione um ou mais arquivos.', true);
             return;
         }
-        
+        if (isUploading) return; // Previne duplo clique
+
+        // 1. Inicia o estado de upload
+        isUploading = true;
+        cancelUpload = false;
+        uploadForm.classList.add('is-uploading'); // CSS vai trocar os botões
+
         const totalFiles = selectedFiles.length;
         let filesUploaded = 0;
         let errors = [];
 
-        showMessage(uploadMessage, `Iniciando envio de ${totalFiles} fotos...`);
-
-        // Usa um loop for...of para enviar UM de cada vez
-        // Isso nos dá um feedback de progresso claro
         for (const file of selectedFiles) {
+            // 2. Verifica o sinalizador de cancelamento ANTES de cada upload
+            if (cancelUpload) {
+                showMessage(uploadMessage, 'Envio cancelado pelo usuário.', true);
+                break; // Sai do loop
+            }
+
             showMessage(uploadMessage, `Enviando ${filesUploaded + 1} de ${totalFiles}: ${file.name}...`);
             const { error } = await service.uploadPhoto(file);
 
@@ -174,24 +188,38 @@ export function setupUIListeners() {
             }
         }
 
-        // Reportar o resultado final
-        if (errors.length > 0) {
-            showMessage(uploadMessage, `Envio concluído com ${errors.length} erros. ${filesUploaded} fotos enviadas.`, true);
-        } else {
-            showMessage(uploadMessage, `Sucesso! Todas as ${totalFiles} fotos foram enviadas.`);
+        // 3. Finaliza o estado de upload (aconteça o que acontecer)
+        isUploading = false;
+        uploadForm.classList.remove('is-uploading'); // CSS restaura os botões
+
+        // 4. Reporta o resultado
+        if (!cancelUpload) { // Só mostra o resultado final se não foi cancelado
+            if (errors.length > 0) {
+                showMessage(uploadMessage, `Envio concluído com ${errors.length} erros. ${filesUploaded} fotos enviadas.`, true);
+            } else {
+                showMessage(uploadMessage, `Sucesso! Todas as ${totalFiles} fotos foram enviadas.`);
+            }
         }
-        
-        // Limpa e recarrega
+
+        // 5. Limpa e recarrega
         uploadForm.reset(); 
         selectedFiles = [];
         fileNameSpan.textContent = 'Nenhum arquivo selecionado';
         await refreshGallery(); 
     });
 
-    // --- Listener de Logout ---
+    // --- MUDANÇA: Listener do botão "Cancelar" ---
+    cancelUploadButton.addEventListener('click', () => {
+        if (isUploading) {
+            showMessage(uploadMessage, 'Cancelando... Aguarde o término do arquivo atual.', true);
+            cancelUpload = true; // Define o sinalizador
+        }
+    });
+
+    // --- Listener de Logout (Não muda) ---
     logoutButton.addEventListener('click', service.handleLogout);
 
-    // --- Listeners do Grid (Deletar, Renomear, Abrir Lightbox) ---
+    // --- Listeners do Grid (Não muda) ---
     galleryGrid.addEventListener('click', async (event) => {
         const target = event.target;
         const filename = target.dataset.filename;
@@ -220,7 +248,7 @@ export function setupUIListeners() {
         }
     });
 
-    // --- Listeners do Lightbox (Fechar, Setas, Teclado, Swipe) ---
+    // --- Listeners do Lightbox (Não muda) ---
     lightboxClose.addEventListener('click', closeLightbox);
     lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) closeLightbox(); });
     lightboxNext.addEventListener('click', () => showPhotoAtIndex(currentPhotoIndex + 1));

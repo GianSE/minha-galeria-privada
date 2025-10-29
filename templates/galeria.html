@@ -22,14 +22,16 @@
             
             <div id="drop-zone" class="drop-zone">
                 <input type="file" id="file-input" class="drop-zone__input" accept="image/*" multiple>
-                
                 <p class="drop-zone__prompt">
                     Arraste e solte suas fotos aqui<br>ou <strong>clique para selecionar</strong>
                 </p>
                 <span id="file-name" class="drop-zone__file-name">Nenhum arquivo selecionado</span>
             </div>
             
-            <button type="submit">Enviar</button>
+            <div class="upload-actions">
+                <button type="submit" id="submit-upload-button">Enviar</button>
+                <button type="button" id="cancel-upload-button" class="hidden">Cancelar Envio</button>
+            </div>
             <p id="upload-message" class="message"></p>
         </form>
 
