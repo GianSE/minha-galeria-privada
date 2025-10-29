@@ -4,11 +4,36 @@
     <meta charset="UTF-8">
     <title>Minha Galeria</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="../static/css/gallery.css">
 </head>
 <body>
-    <h1>Minhas Fotos</h1>
-    <p>Em breve...</p>
 
-    <script src="../static/js/app.js"></script>
+    <header class="gallery-header">
+        <h1>Minhas Fotos</h1>
+        <button id="logout-button">Sair (Logout)</button>
+    </header>
+
+    <main>
+        <form id="upload-form" class="upload-section">
+            <h2>Enviar nova foto</h2>
+            
+            <div id="drop-zone" class="drop-zone">
+                <input type="file" id="file-input" class="drop-zone__input" accept="image/*">
+                <p class="drop-zone__prompt">
+                    Arraste e solte sua foto aqui<br>ou <strong>clique para selecionar</strong>
+                </p>
+                <span id="file-name" class="drop-zone__file-name">Nenhum arquivo selecionado</span>
+            </div>
+            
+            <button type="submit">Enviar</button>
+            <p id="upload-message" class="message"></p>
+        </form>
+
+        <div id="gallery-grid" class="gallery-grid">
+            </div>
+    </main>
+
+    <script src="../static/js/gallery.js"></script>
 </body>
 </html>

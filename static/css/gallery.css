@@ -1,0 +1,111 @@
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+button {
+    cursor: pointer;
+}
+.message {
+    padding: 10px; border-radius: 4px; margin-top: 15px;
+    text-align: center; box-sizing: border-box;
+    visibility: hidden;
+}
+.message-success {
+    background-color: #d4edda; color: #155724; visibility: visible;
+}
+.message-error {
+    background-color: #f8d7da; color: #721c24; visibility: visible;
+}
+
+/* --- Estilos da Galeria --- */
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+.gallery-header h1 { margin: 0; }
+
+#logout-button {
+    background-color: #dc3545; color: white; border: none;
+    padding: 10px 15px; border-radius: 4px; font-size: 14px;
+}
+#logout-button:hover { background-color: #c82333; }
+
+main {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+.upload-section {
+    background: #f9f9f9; border: 1px solid #ddd;
+    padding: 20px; border-radius: 8px; margin-bottom: 30px;
+}
+.upload-section h2 { margin-top: 0; }
+
+/* --- Estilos Drag-and-Drop --- */
+.drop-zone {
+    width: 100%; height: 150px; border: 2px dashed #ccc;
+    border-radius: 8px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    background-color: #fafafa; cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    margin-bottom: 15px;
+}
+.drop-zone__input { display: none; }
+.drop-zone__prompt { color: #888; }
+.drop-zone__prompt strong { color: #007bff; }
+.drop-zone__file-name {
+    color: #333; font-weight: bold;
+    font-size: 0.9em; margin-top: 5px;
+}
+.drop-zone--over {
+    background-color: #e9f5ff; border-color: #007bff;
+}
+
+/* --- NOVOS ESTILOS (Fase 5) --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+.gallery-item {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+.gallery-item-info {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+.gallery-item-info span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+}
+.delete-button {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 0.8em;
+}
+.delete-button:hover { background: #e60000; }
