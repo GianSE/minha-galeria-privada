@@ -47,3 +47,44 @@ main {
     margin-bottom: 20px;
     text-align: center;
 }
+
+/* --- NOVOS ESTILOS (Fase 6.1 - Lightbox) --- */
+
+.lightbox-modal {
+    display: none; /* Escondido por padrão */
+    position: fixed; /* Cobre a tela inteira */
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh; /* 90% da altura da tela */
+    object-fit: contain;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+    color: #bbb;
+    text-decoration: none;
+}
