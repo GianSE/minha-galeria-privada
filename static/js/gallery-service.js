@@ -2,6 +2,9 @@
 import { supabaseClient } from './supabase-config.js';
 
 let currentUser = null;
+// --- MUDANÇA AQUI: Definimos um nome de pasta compartilhada ---
+const SHARED_FOLDER = 'shared';
+// --- FIM DA MUDANÇA ---
 
 // --- 1. AUTENTICAÇÃO ---
 
@@ -25,39 +28,45 @@ export async function handleLogout() {
 // --- 2. STORAGE (FOTOS) ---
 
 export async function loadPhotos() {
-    if (!currentUser) return { files: [], totalSize: 0, error: 'Usuário não logado' };
+    if (!currentUser) return { photoData: [], totalSize: 0, error: 'Usuário não logado' };
 
+    // --- MUDANÇA AQUI: Usa SHARED_FOLDER ao invés de currentUser.id ---
     const { data: files, error } = await supabaseClient.storage
         .from('fotos') 
-        .list(currentUser.id, { 
+        .list(SHARED_FOLDER, { // <- MUDOU AQUI
             limit: 100, offset: 0,
             sortBy: { column: 'created_at', order: 'desc' },
         });
 
     if (error) {
         console.error('DEBUG: Erro ao listar arquivos:', error.message);
-        return { files: [], totalSize: 0, error: error.message };
+        return { photoData: [], totalSize: 0, error: error.message };
+    }
+
+    if (!files || files.length === 0) {
+        console.log("DEBUG: Nenhuma foto encontrada na pasta 'shared'.");
+        return { photoData: [], totalSize: 0, error: null };
     }
 
     let totalSize = 0;
+    const paths = [];
     for (const file of files) {
         if (file.metadata && file.metadata.size) {
             totalSize += file.metadata.size;
         }
+        // --- MUDANÇA AQUI: Usa SHARED_FOLDER ao invés de currentUser.id ---
+        paths.push(`${SHARED_FOLDER}/${file.name}`); // <- MUDOU AQUI
     }
 
-    // Pega as URLs assinadas para todos os arquivos de uma vez
-    const paths = files.map(file => `${currentUser.id}/${file.name}`);
     const { data: urlsData, error: urlsError } = await supabaseClient.storage
         .from('fotos')
-        .createSignedUrls(paths, 3600); // 1 hora de validade
+        .createSignedUrls(paths, 3600); 
 
     if (urlsError) {
         console.error('DEBUG: Erro ao criar URLs:', urlsError.message);
-        return { files: [], totalSize: 0, error: urlsError.message };
+        return { photoData: [], totalSize: 0, error: urlsError.message };
     }
 
-    // Combina os dados do arquivo com sua URL assinada
     const photoData = files.map(file => {
         const urlEntry = urlsData.find(entry => entry.path.endsWith(file.name));
         return {
@@ -70,17 +79,23 @@ export async function loadPhotos() {
 }
 
 export async function deletePhoto(filename) {
-    if (!currentUser || !filename) return;
+    if (!currentUser || !filename) {
+        return { error: { message: "Usuário ou nome de arquivo inválido" } };
+    }
+    // --- MUDANÇA AQUI: Usa SHARED_FOLDER ao invés de currentUser.id ---
     const { error } = await supabaseClient.storage
         .from('fotos')
-        .remove([`${currentUser.id}/${filename}`]); 
+        .remove([`${SHARED_FOLDER}/${filename}`]); // <- MUDOU AQUI
     return { error };
 }
 
 export async function renamePhoto(oldFilename, newFilename) {
-    if (!currentUser) return;
-    const oldPath = `${currentUser.id}/${oldFilename}`;
-    const newPath = `${currentUser.id}/${newFilename}`;
+    if (!currentUser) {
+        return { error: { message: "Usuário não logado" } };
+    }
+    // --- MUDANÇA AQUI: Usa SHARED_FOLDER ao invés de currentUser.id ---
+    const oldPath = `${SHARED_FOLDER}/${oldFilename}`; // <- MUDOU AQUI
+    const newPath = `${SHARED_FOLDER}/${newFilename}`; // <- MUDOU AQUI
     
     const { error } = await supabaseClient.storage
         .from('fotos')
@@ -89,11 +104,22 @@ export async function renamePhoto(oldFilename, newFilename) {
 }
 
 export async function uploadPhoto(file) {
-    if (!currentUser || !file) return;
+    if (!currentUser) {
+        console.error("DEBUG: uploadPhoto falhou, currentUser é nulo.");
+        return { error: { message: "Usuário não está logado." } };
+    }
+    if (!file) {
+        return { error: { message: "Nenhum arquivo selecionado" } };
+    }
     
-    const filePath = `${currentUser.id}/${file.name}`;
+    // --- MUDANÇA AQUI: Usa SHARED_FOLDER ao invés de currentUser.id ---
+    const filePath = `${SHARED_FOLDER}/${file.name}`; // <- MUDOU AQUI
+    console.log(`DEBUG: Enviando para ${filePath}...`);
     const { error } = await supabaseClient.storage
       .from('fotos')
-      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+      .upload(filePath, file, { 
+          cacheControl: '3600', 
+          upsert: false
+        });
     return { error };
 }
