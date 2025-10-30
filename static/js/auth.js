@@ -8,15 +8,27 @@ console.log('DEBUG: auth.js carregado. Supabase conectado.');
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- LÓGICA DE LOGIN (E-mail/Senha) ---
+    // --- MUDANÇA 1: Seleciona os elementos no início ---
     const loginForm = document.getElementById('login-form');
+    const emailInput = document.getElementById('login-email');
+    const rememberMeCheckbox = document.getElementById('remember-me');
+    const messageElement = document.getElementById('login-message');
+
+    // --- MUDANÇA 2: LÓGICA PARA CARREGAR E-MAIL SALVO ---
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+        emailInput.value = rememberedEmail;
+        rememberMeCheckbox.checked = true;
+    }
+    // --- FIM DA MUDANÇA 2 ---
+
+    // --- LÓGICA DE LOGIN (E-mail/Senha) ---
     if (loginForm) {
-      // ... (código de login existente) ...
       loginForm.addEventListener('submit', async (event) => {
         event.preventDefault(); 
-        const emailInput = document.getElementById('login-email');
+        
+        // (Não precisa mais buscar os elementos, já buscamos acima)
         const passwordInput = document.getElementById('login-password');
-        const messageElement = document.getElementById('login-message');
         
         messageElement.className = 'message';
         messageElement.textContent = 'Entrando...';
@@ -36,31 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
           messageElement.textContent = 'Logado com sucesso! Redirecionando...';
           messageElement.className = 'message message-success';
 
+          // --- MUDANÇA 3: LÓGICA PARA SALVAR/REMOVER E-MAIL ---
+          if (rememberMeCheckbox.checked) {
+              localStorage.setItem('rememberedEmail', emailInput.value);
+          } else {
+              localStorage.removeItem('rememberedEmail');
+          }
+          // --- FIM DA MUDANÇA 3 ---
+
           setTimeout(() => {
             window.location.href = 'templates/galeria.html'; // Caminho da pasta
           }, 1500); 
         }
       });
     } 
-
-    // --- MUDANÇA: LÓGICA DE LOGIN COM GOOGLE ---
-    const googleLoginButton = document.getElementById('google-login-button');
-    if (googleLoginButton) {
-        googleLoginButton.addEventListener('click', async () => {
-            // Esta função redireciona o usuário para a tela de login do Google
-            const { error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    // OBRIGATÓRIO: O Supabase vai redirecionar para a galeria após o login.
-                    redirectTo: `${window.location.origin}/templates/galeria.html`
-                }
-            });
-
-            if (error) {
-                alert('Erro ao tentar conectar com Google: ' + error.message);
-                console.error('Erro Google Auth:', error);
-            }
-        });
-    }
-    // --- FIM DA MUDANÇA ---
 });

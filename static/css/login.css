@@ -29,50 +29,23 @@ button:hover { background-color: #0056b3; }
     background-color: #f8d7da; color: #721c24; visibility: visible;
 }
 
-/* --- Estilo Google Login (Com Imagem e Hover Effect) --- */
-.google-login-button {
-    /* MUDANÇA: Adicionando a transição aqui */
-    transition: transform 0.2s ease-in-out, background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-    
-    width: auto; 
-    padding: 12px 24px 12px 24px;
-    margin-top: 15px;
-    
-    background-color: #ffffff; 
-    border: 1px solid #dadce0; 
-    border-radius: 50px; 
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.25); 
-    
+/* --- NOVOS ESTILOS (Lembrar-me) --- */
+#remember-me-div {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o checkbox e o texto */
+    margin-bottom: 15px; /* Mantém o espaçamento do formulário */
+}
+
+/* Ajusta o label do "Lembrar-me" */
+#remember-me-div label {
+    display: inline;
+    margin-bottom: 0;
+    font-weight: normal; /* Opcional: texto mais suave */
     cursor: pointer;
-    font-size: 16px; 
-    font-weight: 500; 
-    
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
 }
 
-.google-login-button:hover {
-    background-color: #f8f8f8; 
-    border-color: #c9c9c9;
-    box-shadow: 0 4px 6px 0 rgba(0,0,0,0.20); 
-
-    /* MUDANÇA: Adiciona o efeito de crescer levemente */
-    transform: scale(1.03); /* Aumenta 3% */
-    
-    /* OU para um efeito de "mexida" para cima (descomente se preferir): */
-    /* transform: translateY(-2px); */ 
-}
-
-/* Estilo para o ícone do Google dentro do botão */
-.google-icon {
-    width: 18px; 
-    height: 18px;
-    margin-right: 12px; 
-}
-
-/* Estilo para o texto dentro do botão */
-.google-login-button span {
-    color: #3c4043; 
-    font-family: 'Google Sans', Arial, sans-serif; 
+/* Ajusta o input do "Lembrar-me" */
+#remember-me-div input {
+    width: auto; /* Remove a largura total padrão */
 }
