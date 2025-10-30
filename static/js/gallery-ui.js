@@ -2,15 +2,17 @@
 import { formatBytes } from './supabase-config.js';
 import *as service from './gallery-service.js';
 
-// --- Variáveis do DOM (definidas na inicialização) ---
+// --- Variáveis do DOM (Desktop) ---
 let galleryGrid, uploadForm, logoutButton, fileInput, dropZone;
 let fileNameSpan, uploadMessage, storageInfo;
 let lightboxModal, lightboxImg, lightboxClose, lightboxPrev, lightboxNext;
 let submitUploadButton, cancelUploadButton; 
-
-// --- MUDANÇA: Novas variáveis para navegação e sidebar ---
 let navLinkView, navLinkUpload, pageView, pageUpload;
 let sidebar, sidebarToggle;
+
+// --- MUDANÇA: Novas variáveis para o Menu Móvel ---
+let mobileMenuButton, mobileNavModal, mobileModalClose;
+let mobileNavLinkView, mobileNavLinkUpload;
 
 // --- Variáveis de Estado da UI ---
 let selectedFiles = []; 
@@ -121,7 +123,7 @@ export async function refreshGallery() { /* ... (código igual) ... */
 // --- 4. FUNÇÃO DE CONFIGURAÇÃO DOS EVENTOS ---
 
 export function setupUIListeners() {
-    // Define as variáveis do DOM
+    // --- Pega elementos do Desktop ---
     galleryGrid = document.getElementById('gallery-grid');
     uploadForm = document.getElementById('upload-form');
     logoutButton = document.getElementById('logout-button');
@@ -137,37 +139,73 @@ export function setupUIListeners() {
     lightboxNext = document.getElementById('lightbox-next');
     submitUploadButton = document.getElementById('submit-upload-button');
     cancelUploadButton = document.getElementById('cancel-upload-button');
-    
-    // Pega os elementos da navegação
     navLinkView = document.getElementById('nav-link-view');
     navLinkUpload = document.getElementById('nav-link-upload');
     pageView = document.getElementById('page-view');
     pageUpload = document.getElementById('page-upload');
-
-    // --- MUDANÇA: Pega os novos elementos da sidebar ---
     sidebar = document.getElementById('sidebar');
     sidebarToggle = document.getElementById('sidebar-toggle');
 
-    if (!uploadForm || !galleryGrid || !logoutButton || !sidebarToggle) {
-        console.error("DEBUG: Elementos essenciais da UI não encontrados. Verifique seu HTML.");
-        return;
+    // --- MUDANÇA: Pega os novos elementos do Móvel ---
+    mobileMenuButton = document.getElementById('mobile-menu-button');
+    mobileNavModal = document.getElementById('mobile-nav-modal');
+    mobileModalClose = document.getElementById('mobile-modal-close');
+    mobileNavLinkView = document.getElementById('mobile-nav-link-view');
+    mobileNavLinkUpload = document.getElementById('mobile-nav-link-upload');
+
+
+    // --- Listeners do Desktop (Sidebar) ---
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            sidebar.classList.toggle('expanded');
+        });
+    }
+    if (navLinkView) {
+        navLinkView.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('view');
+        });
+    }
+    if (navLinkUpload) {
+        navLinkUpload.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('upload');
+        });
+    }
+    if (logoutButton) {
+        logoutButton.addEventListener('click', service.handleLogout);
     }
 
-    // --- MUDANÇA: Listener do Botão de Toggle da Sidebar ---
-    sidebarToggle.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede que o clique se propague
-        sidebar.classList.toggle('expanded'); // "Pina" ou "Solta" a sidebar
-    });
-
-    // --- Listeners do Menu Lateral ---
-    navLinkView.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage('view');
-    });
-    navLinkUpload.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage('upload');
-    });
+    // --- MUDANÇA: Listeners do Menu Móvel ---
+    if (mobileMenuButton) {
+        mobileMenuButton.addEventListener('click', openMobileModal);
+    }
+    if (mobileModalClose) {
+        mobileModalClose.addEventListener('click', closeMobileModal);
+    }
+    if (mobileNavModal) {
+        // Fecha se clicar fora da caixa (no overlay)
+        mobileNavModal.addEventListener('click', (e) => {
+            if (e.target === mobileNavModal) {
+                closeMobileModal();
+            }
+        });
+    }
+    if (mobileNavLinkView) {
+        mobileNavLinkView.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('view');
+            closeMobileModal(); // Fecha o modal após clicar
+        });
+    }
+    if (mobileNavLinkUpload) {
+        mobileNavLinkUpload.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('upload');
+            closeMobileModal(); // Fecha o modal após clicar
+        });
+    }
 
     // --- (Função "clearSelection" não muda) ---
     function clearSelection() {
