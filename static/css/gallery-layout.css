@@ -1,0 +1,157 @@
+/* --- ESTILOS DO NOVO LAYOUT (Menu Lateral) --- */
+
+body {
+    display: flex;
+}
+
+/* MUDANÇA: Estado "Recolhido" (padrão) */
+#sidebar {
+    width: 80px; /* Tamanho recolhido */
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #2c3e50;
+    color: white;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* Esconde texto que vazar */
+    
+    /* A mágica da animação */
+    transition: width 0.3s ease;
+}
+
+/* MUDANÇA: Estado "Expandido" (no hover OU quando "pinado" com a classe) */
+#sidebar:hover,
+#sidebar.expanded {
+    width: 250px; /* Tamanho expandido */
+}
+
+/* MUDANÇA: Cabeçalho da Sidebar (Título + Botão) */
+#sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Coloca o título de um lado, a seta do outro */
+    padding: 20px;
+    border-bottom: 1px solid #4a627a;
+}
+
+#sidebar h1 {
+    margin: 0;
+    font-size: 1.3em; /* Ajuste de tamanho */
+}
+
+/* MUDANÇA: Estilo do Botão de Toggle (Seta) */
+#sidebar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px;
+    transition: transform 0.3s ease;
+}
+
+/* MUDANÇA: Gira a seta quando expandido */
+#sidebar:hover #sidebar-toggle i,
+#sidebar.expanded #sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Lista de links */
+.nav-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+    flex-grow: 1; 
+}
+
+/* MUDANÇA: Estilo dos links (Ícone + Texto) */
+.nav-link {
+    display: flex; /* Alinha ícone e texto */
+    align-items: center;
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 12px 28px; /* Padding ajustado para o ícone */
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: background-color 0.2s;
+    white-space: nowrap; /* Impede que o texto quebre linha */
+}
+
+.nav-link:hover {
+    background-color: #34495e;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    font-weight: bold;
+}
+
+/* MUDANÇA: Estilo dos ícones e do texto */
+.nav-link i,
+#logout-button i {
+    font-size: 1.1em;
+    width: 24px; /* Largura fixa para alinhamento */
+    text-align: center;
+}
+
+.sidebar-text {
+    margin-left: 15px; /* Espaço entre ícone e texto */
+    
+    /* MUDANÇA: Animação de fade-in/out do texto */
+    opacity: 0;
+    display: none; /* Começa escondido */
+    transition: opacity 0.2s ease, display 0.2s;
+}
+
+/* MUDANÇA: Mostra o texto quando a sidebar expande */
+#sidebar:hover .sidebar-text,
+#sidebar.expanded .sidebar-text {
+    display: inline;
+    opacity: 1;
+}
+
+/* MUDANÇA: Botão de Sair (agora com ícone) */
+#sidebar #logout-button {
+    width: 100%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-size: 14px;
+    cursor: pointer;
+    
+    display: flex; /* Alinha ícone e texto */
+    align-items: center;
+    white-space: nowrap;
+}
+#sidebar #logout-button:hover {
+    background-color: #c82333;
+}
+
+
+/* --- Conteúdo Principal --- */
+#main-content {
+    /* MUDANÇA: Margem inicial "recolhida" */
+    margin-left: 80px; 
+    flex-grow: 1;
+    padding: 20px;
+    box-sizing: border-box;
+    width: calc(100% - 80px);
+    
+    /* MUDANÇA: Animação da margem */
+    transition: margin-left 0.3s ease;
+}
+
+/* MUDANÇA: Margem "expandida" */
+#sidebar:hover + #main-content,
+#sidebar.expanded + #main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+
+/* --- Controle das "Páginas" --- */
+.page-content { display: none; }
+.page-content.active { display: block; }

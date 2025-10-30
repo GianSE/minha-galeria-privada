@@ -1,12 +1,16 @@
 // Este arquivo lida com TODA a manipulação do DOM (Interface)
 import { formatBytes } from './supabase-config.js';
-import * as service from './gallery-service.js';
+import *as service from './gallery-service.js';
 
 // --- Variáveis do DOM (definidas na inicialização) ---
 let galleryGrid, uploadForm, logoutButton, fileInput, dropZone;
 let fileNameSpan, uploadMessage, storageInfo;
 let lightboxModal, lightboxImg, lightboxClose, lightboxPrev, lightboxNext;
 let submitUploadButton, cancelUploadButton; 
+
+// --- MUDANÇA: Novas variáveis para navegação e sidebar ---
+let navLinkView, navLinkUpload, pageView, pageUpload;
+let sidebar, sidebarToggle;
 
 // --- Variáveis de Estado da UI ---
 let selectedFiles = []; 
@@ -15,6 +19,27 @@ let currentPhotoIndex = 0;
 let touchStartX = 0, touchMoveX = 0;
 let isUploading = false;
 let cancelUpload = false;
+
+// --- MUDANÇA: Função para trocar de "página" ---
+function showPage(pageIdToShow) {
+    // 1. Esconde todas as páginas
+    [pageView, pageUpload].forEach(page => {
+        if(page) page.classList.remove('active');
+    });
+    // 2. Remove 'active' de todos os links
+    [navLinkView, navLinkUpload].forEach(link => {
+        if(link) link.classList.remove('active');
+    });
+
+    // 3. Mostra a página e ativa o link correto
+    if (pageIdToShow === 'view') {
+        if(pageView) pageView.classList.add('active');
+        if(navLinkView) navLinkView.classList.add('active');
+    } else if (pageIdToShow === 'upload') {
+        if(pageUpload) pageUpload.classList.add('active');
+        if(navLinkUpload) navLinkUpload.classList.add('active');
+    }
+}
 
 // --- 1. FUNÇÕES DE RENDERIZAÇÃO E UI ---
 // (Funções showMessage não muda)
@@ -112,11 +137,37 @@ export function setupUIListeners() {
     lightboxNext = document.getElementById('lightbox-next');
     submitUploadButton = document.getElementById('submit-upload-button');
     cancelUploadButton = document.getElementById('cancel-upload-button');
+    
+    // Pega os elementos da navegação
+    navLinkView = document.getElementById('nav-link-view');
+    navLinkUpload = document.getElementById('nav-link-upload');
+    pageView = document.getElementById('page-view');
+    pageUpload = document.getElementById('page-upload');
 
-    if (!uploadForm || !galleryGrid || !logoutButton || !lightboxModal) {
+    // --- MUDANÇA: Pega os novos elementos da sidebar ---
+    sidebar = document.getElementById('sidebar');
+    sidebarToggle = document.getElementById('sidebar-toggle');
+
+    if (!uploadForm || !galleryGrid || !logoutButton || !sidebarToggle) {
         console.error("DEBUG: Elementos essenciais da UI não encontrados. Verifique seu HTML.");
         return;
     }
+
+    // --- MUDANÇA: Listener do Botão de Toggle da Sidebar ---
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique se propague
+        sidebar.classList.toggle('expanded'); // "Pina" ou "Solta" a sidebar
+    });
+
+    // --- Listeners do Menu Lateral ---
+    navLinkView.addEventListener('click', (e) => {
+        e.preventDefault();
+        showPage('view');
+    });
+    navLinkUpload.addEventListener('click', (e) => {
+        e.preventDefault();
+        showPage('upload');
+    });
 
     // --- (Função "clearSelection" não muda) ---
     function clearSelection() {

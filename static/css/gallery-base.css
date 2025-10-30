@@ -15,23 +15,13 @@ button { cursor: pointer; }
 .message-error {
     background-color: #f8d7da; color: #721c24; visibility: visible;
 }
-.gallery-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
-    max-width: 1200px;
-    margin: 20px auto;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-.gallery-header h1 { margin: 0; }
-#logout-button {
-    background-color: #dc3545; color: white; border: none;
-    padding: 10px 15px; border-radius: 4px; font-size: 14px;
-}
-#logout-button:hover { background-color: #c82333; }
+
+/* --- ESTILOS REMOVIDOS --- */
+/* .gallery-header e #logout-button foram removidos daqui */
+/* --- FIM DA REMOÇÃO --- */
+
 main {
+    /* Este estilo agora é aplicado dentro de #main-content */
     width: 90%;
     max-width: 1200px;
     margin: 20px auto;
@@ -49,7 +39,7 @@ main {
 }
 
 /* --- NOVOS ESTILOS (Fase 6.1 - Lightbox) --- */
-
+/* ... (Estilos do Lightbox permanecem iguais) ... */
 .lightbox-modal {
     display: none; /* Escondido por padrão */
     position: fixed; /* Cobre a tela inteira */
@@ -63,7 +53,7 @@ main {
     align-items: center;
     justify-content: center;
 }
-
+/* ... (Resto dos estilos do lightbox) ... */
 .lightbox-content {
     margin: auto;
     display: block;

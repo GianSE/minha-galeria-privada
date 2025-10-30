@@ -2,44 +2,76 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Minha Galeria</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Galeria Thalia e Gian</title> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <link rel="stylesheet" href="../static/css/gallery-base.css">
+    <link rel="stylesheet" href="../static/css/gallery-layout.css"> 
     <link rel="stylesheet" href="../static/css/gallery-upload.css">
     <link rel="stylesheet" href="../static/css/gallery-grid.css">
 </head>
 <body>
 
-    <header class="gallery-header">
-        <h1>Minhas Fotos</h1>
-        <button id="logout-button">Sair (Logout)</button>
-    </header>
-
-    <main>
-        <form id="upload-form" class="upload-section">
-            <h2>Enviar nova foto</h2>
-            
-            <div id="drop-zone" class="drop-zone">
-                <input type="file" id="file-input" class="drop-zone__input" accept="image/*" multiple>
-                <p class="drop-zone__prompt">
-                    Arraste e solte suas fotos aqui<br>ou <strong>clique para selecionar</strong>
-                </p>
-                <span id="file-name" class="drop-zone__file-name">Nenhum arquivo selecionado</span>
-            </div>
-            
-            <div class="upload-actions">
-                <button type="submit" id="submit-upload-button">Enviar</button>
-                <button type="button" id="cancel-upload-button" class="hidden">Cancelar Envio</button>
-            </div>
-            <p id="upload-message" class="message"></p>
-        </form>
-
-        <div id="storage-info" class="storage-info">
-            Carregando uso de dados...
+    <nav id="sidebar">
+        <div id="sidebar-header">
+            <h1><span class="sidebar-text">Galeria <br> Thalia S2 Gian</span></h1>
+            <button id="sidebar-toggle">
+                <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
-        <div id="gallery-grid" class="gallery-grid">
+        
+        <ul class="nav-links">
+            <li>
+                <a href="#" id="nav-link-view" class="nav-link active">
+                    <i class="fas fa-images"></i>
+                    <span class="sidebar-text">Ver Fotos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="nav-link-upload" class="nav-link">
+                    <i class="fas fa-upload"></i>
+                    <span class="sidebar-text">Enviar Fotos</span>
+                </a>
+            </li>
+        </ul>
+        
+        <button id="logout-button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="sidebar-text">Sair (Logout)</span>
+        </button>
+    </nav>
+
+    <main id="main-content">
+        
+        <div id="page-view" class="page-content">
+            <div id="storage-info" class="storage-info">
+                Carregando uso de dados...
             </div>
+            <div id="gallery-grid" class="gallery-grid">
+                </div>
+        </div>
+
+        <div id="page-upload" class="page-content">
+            <form id="upload-form" class="upload-section">
+                <h2>Enviar nova foto</h2>
+                
+                <div id="drop-zone" class="drop-zone">
+                    <input type="file" id="file-input" class="drop-zone__input" accept="image/*" multiple>
+                    <p class="drop-zone__prompt">
+                        Arraste e solte suas fotos aqui<br>ou <strong>clique para selecionar</strong>
+                    </p>
+                    <span id="file-name" class="drop-zone__file-name">Nenhum arquivo selecionado</span>
+                </div>
+                
+                <div class="upload-actions">
+                    <button type="submit" id="submit-upload-button">Enviar</button>
+                    <button type="button" id="cancel-upload-button" class="hidden">Cancelar Envio</button>
+                </div>
+                <p id="upload-message" class="message"></p>
+            </form>
+        </div>
+        
     </main>
 
     <div id="lightbox-modal" class="lightbox-modal">
