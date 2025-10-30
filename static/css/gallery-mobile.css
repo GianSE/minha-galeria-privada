@@ -10,7 +10,7 @@
 
 
 /* --- LAYOUT MÓVEL (Quando a tela for 768px ou menor) --- */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) { */
 
     /* 1. Esconde a Sidebar de Desktop */
     #sidebar {
@@ -23,7 +23,9 @@
         align-items: center;
         justify-content: space-between;
         padding: 0 20px;
-        height: 60px;
+        height: 8vw; /* <--- CORRIGIDO */
+        min-height: 50px;
+        min-width: 50px;
         background-color: #2c3e50; /* Cor da sidebar */
         color: white;
         position: fixed; /* Fica fixo no topo */
@@ -85,8 +87,8 @@
         margin: auto;
         padding: 20px;
         border-radius: 8px;
-        width: 80%;
-        max-width: 300px;
+        width: 30vw; /* <-- MUDANÇA: De 80% para 90vw */
+        /* max-width: 300px; */ /* <-- Linha removida/comentada */
         position: relative;
     }
     
@@ -122,4 +124,4 @@
     #mobile-nav-modal ul li a:hover {
         background-color: #f4f4f4;
     }
-}
+/* } */
