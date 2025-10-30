@@ -8,11 +8,10 @@ console.log('DEBUG: auth.js carregado. Supabase conectado.');
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- LÓGICA DA PÁGINA DE LOGIN (Fase 3) ---
+    // --- LÓGICA DE LOGIN (E-mail/Senha) ---
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
-      console.log("DEBUG: Estou na página de login.");
-      
+      // ... (código de login existente) ...
       loginForm.addEventListener('submit', async (event) => {
         event.preventDefault(); 
         const emailInput = document.getElementById('login-email');
@@ -43,4 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     } 
+
+    // --- MUDANÇA: LÓGICA DE LOGIN COM GOOGLE ---
+    const googleLoginButton = document.getElementById('google-login-button');
+    if (googleLoginButton) {
+        googleLoginButton.addEventListener('click', async () => {
+            // Esta função redireciona o usuário para a tela de login do Google
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // OBRIGATÓRIO: O Supabase vai redirecionar para a galeria após o login.
+                    redirectTo: `${window.location.origin}/templates/galeria.html`
+                }
+            });
+
+            if (error) {
+                alert('Erro ao tentar conectar com Google: ' + error.message);
+                console.error('Erro Google Auth:', error);
+            }
+        });
+    }
+    // --- FIM DA MUDANÇA ---
 });
