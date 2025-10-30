@@ -4,9 +4,9 @@ body {
     display: flex;
 }
 
-/* MUDANÇA: Estado "Recolhido" (padrão) */
+/* Estado "Recolhido" (padrão) */
 #sidebar {
-    width: 80px; /* Tamanho recolhido */
+    width: 80px; /* */
     height: 100vh;
     position: fixed;
     top: 0;
@@ -16,33 +16,39 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden; /* Esconde texto que vazar */
-    
-    /* A mágica da animação */
-    transition: width 0.3s ease;
+    overflow-x: hidden;
+    transition: width 0.3s ease; /* */
 }
 
-/* MUDANÇA: Estado "Expandido" (no hover OU quando "pinado" com a classe) */
-#sidebar:hover,
+/* --- MUDANÇA AQUI: LÓGICA SEPARADA --- */
+
+/* 1. Estado "Expandido" (PINADO via Clique) */
 #sidebar.expanded {
-    width: 250px; /* Tamanho expandido */
+    width: 250px; /* */
 }
 
-/* MUDANÇA: Cabeçalho da Sidebar (Título + Botão) */
+/* 2. Estado "Expandido" (TEMPORÁRIO via Hover) */
+/* Só expande no hover se NÃO estiver "pinado" */
+#sidebar:not(.expanded):hover {
+    width: 250px;
+}
+/* --- FIM DA MUDANÇA --- */
+
+/* Cabeçalho da Sidebar (Título + Botão) */
 #sidebar-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Coloca o título de um lado, a seta do outro */
+    justify-content: space-between;
     padding: 20px;
     border-bottom: 1px solid #4a627a;
 }
 
 #sidebar h1 {
     margin: 0;
-    font-size: 1.3em; /* Ajuste de tamanho */
+    font-size: 1.3em;
 }
 
-/* MUDANÇA: Estilo do Botão de Toggle (Seta) */
+/* Estilo do Botão de Toggle (Seta) */
 #sidebar-toggle {
     background: none;
     border: none;
@@ -53,11 +59,14 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* MUDANÇA: Gira a seta quando expandido */
-#sidebar:hover #sidebar-toggle i,
+/* --- MUDANÇA AQUI: Gira a seta (Regras separadas) --- */
 #sidebar.expanded #sidebar-toggle i {
     transform: rotate(180deg);
 }
+#sidebar:not(.expanded):hover #sidebar-toggle i {
+    transform: rotate(180deg);
+}
+/* --- FIM DA MUDANÇA --- */
 
 /* Lista de links */
 .nav-links {
@@ -67,17 +76,17 @@ body {
     flex-grow: 1; 
 }
 
-/* MUDANÇA: Estilo dos links (Ícone + Texto) */
+/* Estilo dos links (Ícone + Texto) */
 .nav-link {
-    display: flex; /* Alinha ícone e texto */
+    display: flex;
     align-items: center;
     color: #ecf0f1;
     text-decoration: none;
-    padding: 12px 28px; /* Padding ajustado para o ícone */
+    padding: 12px 28px;
     border-radius: 4px;
     margin-bottom: 10px;
     transition: background-color 0.2s;
-    white-space: nowrap; /* Impede que o texto quebre linha */
+    white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -89,31 +98,33 @@ body {
     font-weight: bold;
 }
 
-/* MUDANÇA: Estilo dos ícones e do texto */
+/* Estilo dos ícones e do texto */
 .nav-link i,
 #logout-button i {
     font-size: 1.1em;
-    width: 24px; /* Largura fixa para alinhamento */
+    width: 24px;
     text-align: center;
 }
 
 .sidebar-text {
-    margin-left: 15px; /* Espaço entre ícone e texto */
-    
-    /* MUDANÇA: Animação de fade-in/out do texto */
+    margin-left: 15px;
     opacity: 0;
-    display: none; /* Começa escondido */
+    display: none;
     transition: opacity 0.2s ease, display 0.2s;
 }
 
-/* MUDANÇA: Mostra o texto quando a sidebar expande */
-#sidebar:hover .sidebar-text,
+/* --- MUDANÇA AQUI: Mostra o texto (Regras separadas) --- */
 #sidebar.expanded .sidebar-text {
     display: inline;
     opacity: 1;
 }
+#sidebar:not(.expanded):hover .sidebar-text {
+    display: inline;
+    opacity: 1;
+}
+/* --- FIM DA MUDANÇA --- */
 
-/* MUDANÇA: Botão de Sair (agora com ícone) */
+/* Botão de Sair (agora com ícone) */
 #sidebar #logout-button {
     width: 100%;
     background-color: #dc3545;
@@ -122,8 +133,7 @@ body {
     padding: 12px 28px;
     font-size: 14px;
     cursor: pointer;
-    
-    display: flex; /* Alinha ícone e texto */
+    display: flex;
     align-items: center;
     white-space: nowrap;
 }
@@ -134,23 +144,24 @@ body {
 
 /* --- Conteúdo Principal --- */
 #main-content {
-    /* MUDANÇA: Margem inicial "recolhida" */
     margin-left: 80px; 
     flex-grow: 1;
     padding: 20px;
     box-sizing: border-box;
     width: calc(100% - 80px);
-    
-    /* MUDANÇA: Animação da margem */
     transition: margin-left 0.3s ease;
 }
 
-/* MUDANÇA: Margem "expandida" */
-#sidebar:hover + #main-content,
+/* --- MUDANÇA AQUI: Margem (Regras separadas) --- */
 #sidebar.expanded + #main-content {
     margin-left: 250px;
     width: calc(100% - 250px);
 }
+#sidebar:not(.expanded):hover + #main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+/* --- FIM DA MUDANÇA --- */
 
 /* --- Controle das "Páginas" --- */
 .page-content { display: none; }
