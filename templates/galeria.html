@@ -2,7 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Galeria Thalia e Gian</title> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Galeria Thalia e Gian</title> 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
@@ -10,7 +11,7 @@
     <link rel="stylesheet" href="../static/css/gallery-layout.css"> 
     <link rel="stylesheet" href="../static/css/gallery-upload.css">
     <link rel="stylesheet" href="../static/css/gallery-grid.css">
-
+    
     <link rel="stylesheet" href="../static/css/gallery-mobile.css">
 </head>
 <body>
@@ -43,6 +44,22 @@
             <span class="sidebar-text">Sair (Logout)</span>
         </button>
     </nav>
+
+    <header id="mobile-header">
+        <span id="mobile-header-title">Galeria Thalia e Gian</span>
+        <button id="mobile-menu-button">
+            <i class="fas fa-bars"></i> </button>
+    </header>
+
+    <div id="mobile-nav-modal">
+        <div class="modal-content">
+            <button id="mobile-modal-close">&times;</button> <ul>
+                <li><a href="#" id="mobile-nav-link-view">Ver Fotos</a></li>
+                <li><a href="#" id="mobile-nav-link-upload">Enviar Fotos</a></li>
+            </ul>
+        </div>
+    </div>
+
 
     <main id="main-content">
         
